@@ -42,8 +42,7 @@ Respond with either:
 For the temperature display you may set the response header `Temperature-To-Assume`
 (integer °C); the device renders its temperature widget with that value.
 
-The device sends `Authorization: Basic local` (a placeholder) and possibly a
-`Token-Authorization` header. Ignore them.
+A local device sends no authentication headers.
 
 ### `GET <base>/ack?software-version=<v>&device-type=<t>`
 
