@@ -46,10 +46,19 @@ A local device sends no authentication headers.
 
 ### `GET <base>/ack?software-version=<v>&device-type=<t>`
 
-Called after a successful draw. Use it to mark the last-served render as confirmed
-(two-phase commit: if the device downloads a buffer but fails to draw it, it never
-acks, and your server should serve the buffer again). The call is best-effort — the
-device tolerates failures.
+Called after a successful draw. **Implement this** — it is what tells your server the
+render actually reached the panel, so it can treat that render as confirmed and start
+returning empty bodies. A server that ignores acks keeps serving a full buffer on every
+request, and the display does a visible full refresh every wake cycle.
+
+It is a two-phase commit: if the device downloads a buffer but fails to draw it, it
+never acks, and your server should serve the same buffer again.
+
+If the ack cannot be delivered at all (connection refused, timeout), the device restarts
+and retries the whole cycle on its next wake. An HTTP error status does not count as
+undeliverable — a 404 is a completed request — so a server that simply omits `/ack` will
+not restart the device; it will just redraw the panel on every wake, since no render is
+ever confirmed.
 
 One response header is honored: `Reset-Device: true` makes the device erase its
 configuration (factory reset). Serve an all-white render first so the screen ends up
