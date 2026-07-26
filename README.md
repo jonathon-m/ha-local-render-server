@@ -19,12 +19,8 @@ contact info@invisible-computers.com for an expedited upgrade.
 ## Protocol
 
 The device wakes roughly every minute, connects to Wi-Fi, and makes one or two HTTP
-GET requests against the configured base URL. **Use plain `http://`.** The firmware
-ships a single trust anchor — the Invisible Computers root certificate — and no public
-root certificates at all, so it cannot validate a normal HTTPS certificate: a
-certificate from a public authority such as Let's Encrypt is rejected just like a
-self-signed one. Since the traffic stays on your own network and carries no
-credentials, plain HTTP is the intended setup.
+GET requests against the configured base URL. **Use plain `http://`.** 
+(The device uses HTTPS when in non-local cloud mode.)
 
 ### `GET <base>/render`
 
@@ -53,6 +49,9 @@ A local device sends no authentication headers.
 
 ### `GET <base>/ack?software-version=<v>&device-type=<t>`
 
+The two query parameters describe the device's firmware version and panel hardware
+model. They are informational — you can ignore them.
+
 Called after a successful draw. **Implement this** — it is what tells your server the
 render actually reached the panel, so it can treat that render as confirmed and start
 returning empty bodies. A server that ignores acks keeps serving a full buffer on every
@@ -74,8 +73,10 @@ request — overwrite the PNG to update the display.
 
 ```bash
 pip install pillow numpy
-python server.py image.png --device-type GDEY075T7 --port 8080
+python server.py image.png --display 7_5_inch --port 8080
 ```
+
+`--display` accepts `7_5_inch` or `10_2_inch`.
 
 The image must exactly match the display resolution (e.g. 800×480). Any image mode
 works; it is converted to 1-bit with a threshold.
@@ -85,13 +86,10 @@ works; it is converted to 1-bit with a threshold.
 
 The body of a `/render` response is the raw e-paper buffer:
 
-| Device type       | Identifier   | Resolution | Buffer size |
-|-------------------|--------------|------------|-------------|
-| 7.5 inch display  | `GDEY075T7`  | 800 × 480  | 48000 bytes |
-| 10.2 inch display | `GDEM102T91` | 960 × 640  | 76800 bytes |
-
-The identifier is what the device reports as `device-type` on `/ack`, and what
-`server.py` expects for `--device-type`.
+| Display           | Resolution | Buffer size |
+|-------------------|------------|-------------|
+| 7.5 inch display  | 800 × 480  | 48000 bytes |
+| 10.2 inch display | 960 × 640  | 76800 bytes |
 
 Starting from a 1-bit black/white image (white = 1):
 
