@@ -1,0 +1,12 @@
+[project]
+name = "invisible-local-render-server"
+version = "0.1.0"
+description = "Reference local render server for Invisible Computers e-paper displays"
+requires-python = ">=3.9"
+dependencies = ["pillow", "numpy"]
+
+[project.scripts]
+invisible-local-render-server = "server:main"
+
+[tool.setuptools]
+py-modules = ["server"]
