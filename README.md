@@ -68,19 +68,52 @@ blank.
 
 ## Reference server
 
-`server.py` implements the protocol for a PNG file on disk, re-reading it on every
-request — overwrite the PNG to update the display.
+`server.py` converts an image to the panel buffer. Pass a PNG on disk, or a URL that
+returns an image (re-fetched on every `/render`).
 
 ```bash
 pip install pillow numpy
 python server.py image.png --display 7_5_inch --port 8080
+python server.py --url http://192.168.1.10:8123/local/display.png --display 7_5_inch
 ```
 
-`--display` accepts `7_5_inch` or `10_2_inch`.
+`--display` accepts `7_5_inch` or `10_2_inch`. `--token` sends a Bearer token when
+fetching `--url`. Images that are not the exact panel size are resized.
 
-The image must exactly match the display resolution (e.g. 800×480). Any image mode
-works; it is converted to 1-bit with a threshold.
+The image is converted to 1-bit with dithering.
 
+## Home Assistant OS
+
+This repo is a Home Assistant add-on repository. The add-on lives in
+`invisible_local_render/`.
+
+### Install from GitHub
+
+The repository must be **public**. Home Assistant clones it with no GitHub login.
+
+1. Push this repo to GitHub. Change the `url` fields in `repository.yaml` and
+   `invisible_local_render/config.yaml` to your repo if you want.
+2. In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**.
+3. Paste `https://github.com/<you>/<repo>` and add it.
+4. Refresh the store, install **Invisible Local Render**, then start it.
+
+Home Assistant builds the container on the machine (first install takes a few
+minutes). After that, bump `version` in `invisible_local_render/config.yaml`
+whenever you want the store to offer an update.
+
+Private GitHub repos will not work unless you copy the `invisible_local_render`
+folder onto the HAOS **addons** share instead.
+
+### Configure
+
+- **Image URL** — an HTTP endpoint that returns PNG/JPEG, for example
+  `http://homeassistant:8123/local/display.png` for a file in `/config/www/`
+- **Display size** — matching your panel
+- **Bearer token** — only if the URL requires auth. Home Assistant `/api/` URLs
+  (use `http://supervisor/core/api/...`) pick up the supervisor token automatically
+
+Keep port **8080** published, and point the display at
+`http://<home-assistant-lan-ip>:8080`.
 
 ## Buffer format
 

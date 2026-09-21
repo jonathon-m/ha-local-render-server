@@ -1,0 +1,12 @@
+configuration:
+  url:
+    name: Image URL
+    description: HTTP URL that returns a PNG (or other image) for the display.
+  display:
+    name: Display size
+    description: Panel size of your Invisible Computers device.
+  token:
+    name: Bearer token
+    description: Optional token for the image URL. Leave empty for public URLs. Home Assistant API URLs can use the add-on supervisor token automatically.
+network:
+  8080/tcp: HTTP port the e-paper display polls
