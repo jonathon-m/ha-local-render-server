@@ -1,7 +1,7 @@
-# Local render server
+# Invisible Local Render: Home Assistant add-on
 
-Protocol documentation and reference implementation for serving Invisible Computers
-displays from your own machine.
+This repo is a Home Assistant add-on repository. The add-on lives in
+`invisible_local_render/`.
 
 Invisible Computers displays can be pointed at a **local render server** instead of the
 cloud backend. During device setup in the app, choose "Set up a local device" and enter
@@ -10,6 +10,42 @@ display fetches its pre-rendered frames exclusively from that URL — it never c
 the backend, receives no over-the-air firmware updates, and needs no account.
 
 To switch a device back to cloud mode, power-cycle it and run the normal setup again.
+
+## Install from GitHub
+
+1. In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**.
+2. Paste `https://github.com/jonathon-m/ha-local-render-server` and add it.
+3. Refresh the store, install **Invisible Local Render**, then start it.
+
+Home Assistant builds the container on the machine (first install takes a few
+minutes).
+
+## Configure
+
+- **Image URL** — an HTTP endpoint that returns PNG/JPEG, for example
+  `http://homeassistant:8123/local/display.png` for a file in `/config/www/`
+- **Display size** — matching your panel
+- **Bearer token** — only if the URL requires auth. Home Assistant `/api/` URLs
+  (use `http://supervisor/core/api/...`) pick up the supervisor token automatically
+
+Keep port **8080** published, and point the display at
+`http://<home-assistant-lan-ip>:8080`.
+
+## Hosting your own fork
+
+The repository must be **public**. Home Assistant clones it with no GitHub login.
+
+Push this repo to GitHub. Change the `url` fields in `repository.yaml` and
+`invisible_local_render/config.yaml` to your repo if you want. Bump `version` in
+`invisible_local_render/config.yaml` whenever you want the store to offer an update.
+
+Private GitHub repos will not work unless you copy the `invisible_local_render`
+folder onto the HAOS **addons** share instead.
+
+# Local render server
+
+Protocol documentation and reference implementation for serving Invisible Computers
+displays from your own machine.
 
 ## Firmware requirement
 
@@ -81,39 +117,6 @@ python server.py --url http://192.168.1.10:8123/local/display.png --display 7_5_
 fetching `--url`. Images that are not the exact panel size are resized.
 
 The image is converted to 1-bit with dithering.
-
-## Home Assistant OS
-
-This repo is a Home Assistant add-on repository. The add-on lives in
-`invisible_local_render/`.
-
-### Install from GitHub
-
-The repository must be **public**. Home Assistant clones it with no GitHub login.
-
-1. Push this repo to GitHub. Change the `url` fields in `repository.yaml` and
-   `invisible_local_render/config.yaml` to your repo if you want.
-2. In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**.
-3. Paste `https://github.com/<you>/<repo>` and add it.
-4. Refresh the store, install **Invisible Local Render**, then start it.
-
-Home Assistant builds the container on the machine (first install takes a few
-minutes). After that, bump `version` in `invisible_local_render/config.yaml`
-whenever you want the store to offer an update.
-
-Private GitHub repos will not work unless you copy the `invisible_local_render`
-folder onto the HAOS **addons** share instead.
-
-### Configure
-
-- **Image URL** — an HTTP endpoint that returns PNG/JPEG, for example
-  `http://homeassistant:8123/local/display.png` for a file in `/config/www/`
-- **Display size** — matching your panel
-- **Bearer token** — only if the URL requires auth. Home Assistant `/api/` URLs
-  (use `http://supervisor/core/api/...`) pick up the supervisor token automatically
-
-Keep port **8080** published, and point the display at
-`http://<home-assistant-lan-ip>:8080`.
 
 ## Buffer format
 
